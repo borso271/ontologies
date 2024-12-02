@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nested Circles Graph with Cytoscape.js</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.21.2/cytoscape.min.js"></script>
+    <style>
+        #cy {
+            width: 100%;
+            height: 100vh;
+            background-color: #f3f3f3;
+        }
+    </style>
+</head>
+<body>
+    <div id="cy"></div>
+    <script>
+        // Function to build the graph
+        function buildGraph(categories) {
+            const elements = [];
+
+            // Add nodes
+            categories.forEach(category => {
+                elements.push({
+                    data: {
+                        id: String(category.ID),
+                        label: category.Name,
+                        generation: category.Generation
+                    }
+                });
+            });
+
+            // Add edges
+            categories.forEach(category => {
+                if (category["Parent ID"] !== null) {
+                    elements.push({
+                        data: {
+                            id: `edge-${category["Parent ID"]}-${category.ID}`,
+                            source: String(category["Parent ID"]),
+                            target: String(category.ID)
+                        }
+                    });
+                }
+            });
+
+            // Initialize Cytoscape
+            const cy = cytoscape({
+                container: document.getElementById('cy'),
+                elements: elements,
+                style: [
+                    {
+                        selector: 'node',
+                        style: {
+                            'background-color': '#0074D9',
+                            'label': 'data(label)',
+                            'color': '#fff',
+                            'text-valign': 'center',
+                            'text-halign': 'center',
+                            'width': '100px',
+                            'height': '100px',
+                            'font-size': '10px',
+                            'font-weight': 'bold'
+                        }
+                    },
+                    {
+                        selector: 'edge',
+                        style: {
+                            'width': 3,
+                            'line-color': '#AAB7B8',
+                            'target-arrow-color': '#AAB7B8',
+                            'target-arrow-shape': 'triangle'
+                        }
+                    }
+                ],
+                layout: {
+                    name: 'concentric', // Use concentric layout
+                    concentric: function (node) {
+                        // Invert the concentric levels to make Generation 0 the inner circle
+                        return -node.data('generation');
+                    },
+                    levelWidth: function () {
+                        return 1; // Equal spacing between generations
+                    },
+                    padding: 20 // Padding around the graph
+                }
+            });
+        }
+
+        // Fetch JSON data from academic_disciplines.json
+        fetch('academic_disciplines.json')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                buildGraph(data.categories);
+            })
+            .catch(error => {
+                console.error('Error loading the JSON file:', error);
+            });
+    </script>
+</body>
+</html>
