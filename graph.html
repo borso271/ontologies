@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nested Circles Graph with Cytoscape.js</title>
+    <title>Astrosafe Categories</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.21.2/cytoscape.min.js"></script>
     <style>
         #cy {
@@ -88,7 +88,7 @@
         }
 
         // Fetch JSON data from academic_disciplines.json
-        fetch('https://raw.githubusercontent.com/borso271/ontologies/blob/main/academic_disciplines.json')
+         fetch('academic_disciplines.json')
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
